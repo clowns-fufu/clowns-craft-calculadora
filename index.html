@@ -341,10 +341,11 @@
       Gatilho:    { Carvao: 10, Ferro: 0, Prata: 0,  Cobre: 0,  Ouro: 80, Aluminio: 0,  Borracha: 0 },
       Mola:       { Carvao: 10, Ferro: 0, Prata: 40, Cobre: 0,  Ouro: 40, Aluminio: 0,  Borracha: 2 },
       Engrenagem: { Carvao: 10, Ferro: 0, Prata: 0,  Cobre: 40, Ouro: 0,  Aluminio: 40, Borracha: 2 },
-      Cano:       { Carvao: 10, Ferro: 20,Prata: 20, Cobre: 0,  Ouro: 0,  Aluminio: 40, Borracha: 0 },
-      Corp:       { Carvao: 10, Ferro: 40,Prata: 0,  Cobre: 0,  Ouro: 0,  Aluminio: 40, Borracha: 0 }
+      Cano:       { Carvao: 10, Ferro: 20, Prata: 20, Cobre: 0, Ouro: 0,  Aluminio: 40, Borracha: 0 },
+      Corp:       { Carvao: 10, Ferro: 40, Prata: 0,  Cobre: 0, Ouro: 0,  Aluminio: 40, Borracha: 0 }
     };
 
+    // IMPORTANTE: "Scar-SC" tem de ter aspas por causa do hífen
     const weaponParts = {
       "Scar-SC": { Ferro: 1, Gatilho: 1, Mola: 2, Engrenagem: 2, Cano: 1, Corp: 1 },
       "G36":     { Ferro: 1, Gatilho: 1, Mola: 2, Engrenagem: 2, Cano: 1, Corp: 1 },
@@ -478,8 +479,10 @@
         const price = priceInput ? parseFloat((priceInput.value || "0").replace(",", ".")) : 0;
         const qty = weaponCounts[name] || 0;
         const total = price * qty;
+
         const span = document.querySelector('[data-weapon-total="' + name + '"]');
         if (span) span.textContent = formatNumber(total);
+
         weaponsTotal += total;
       });
 
