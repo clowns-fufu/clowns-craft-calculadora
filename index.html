@@ -306,6 +306,12 @@
             </tr>
           </thead>
           <tbody id="pepitas-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Total pepitas (todas)</td>
+              <td><span class="result-number" id="pepitas-total">0</span></td>
+            </tr>
+          </tfoot>
         </table>
 
         <br><br>
@@ -321,6 +327,12 @@
             </tr>
           </thead>
           <tbody id="refined-body"></tbody>
+          <tfoot>
+            <tr>
+              <td colspan="3">Total barras (todas)</td>
+              <td><span class="result-number" id="bars-total">0</span></td>
+            </tr>
+          </tfoot>
         </table>
       </section>
     </div>
@@ -574,16 +586,25 @@
         if (diff > 0) span.classList.add("positive");
       });
 
-      // pepitas necessárias por material (das peças)
+      // pepitas necessárias por material (das peças EM FALTA)
       const pepitasNeed = {};
       materials.forEach(m => pepitasNeed[m] = 0);
 
-      Object.entries(totalParts).forEach(([partName, totalPartQty]) => {
+      // calcular peças em falta (totalNeed - have, mínimo 0)
+      const missingParts = {};
+      parts.forEach(partName => {
+        const totalNeed = totalParts[partName] || 0;
+        const haveInput = document.querySelector('[data-part-have-input="' + partName + '"]');
+        const have = parseAmount(haveInput ? haveInput.value : "");
+        missingParts[partName] = Math.max(0, totalNeed - have);
+      });
+
+      Object.entries(missingParts).forEach(([partName, missingQty]) => {
         const map = materialPerPart[partName];
         if (!map) return;
         materials.forEach(mat => {
           const perPiece = map[mat] || 0;
-          pepitasNeed[mat] += totalPartQty * perPiece;
+          pepitasNeed[mat] += missingQty * perPiece;
         });
       });
 
@@ -621,6 +642,20 @@
         span.textContent = formatNumber(barsNeed[mat] || 0);
       });
 
+      // total pepitas e total barras (somatório)
+      let pepitasTotal = 0;
+      let barsTotal = 0;
+      materials.forEach(mat => {
+        pepitasTotal += (pepitasNeed[mat] || 0);
+        barsTotal += (barsNeed[mat] || 0);
+      });
+
+      const pepitasTotalSpan = document.getElementById("pepitas-total");
+      if (pepitasTotalSpan) pepitasTotalSpan.textContent = formatNumber(pepitasTotal);
+
+      const barsTotalSpan = document.getElementById("bars-total");
+      if (barsTotalSpan) barsTotalSpan.textContent = formatNumber(barsTotal);
+
       // o que já tens (pepitas / barras)
       const pepitasHave = {};
       const barsHave = {};
@@ -653,7 +688,7 @@
       });
     }
 
-    // Recalcular em qualquer input verde (inclui: armas, preços, peças extra, pepitas/barras, colete, e agora "tens" das peças)
+    // Recalcular em qualquer input verde
     document.querySelectorAll(".input.green").forEach(input => {
       input.addEventListener("input", recalc);
     });
